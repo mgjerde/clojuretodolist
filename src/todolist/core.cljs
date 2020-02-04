@@ -17,7 +17,7 @@
      [:li element])
    ])
 
-
+;;sda
 (defn app []
   [:div
    [visliste @todoliste]
