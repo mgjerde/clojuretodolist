@@ -1,43 +1,31 @@
 (ns todolist.core
   (:require [reagent.core :as r]))
 
-;;(enable-console-print!)
+(enable-console-print!)
 ;;(println "This text is printed from src/todolist/core.cljs. Go ahead and edit it and see reloading in action.")
 
-(defonce todoliste (r/atom nil))
+(def todoliste-global (r/atom ()))
 
 (defn visliste [todos]
-  (prn todos)
-  [:div "foo"
-    (map (fn [val] [:div val] ) todos)
+  (prn @todos)
+  [:div
+   (map (fn [val] ^{:key val}[:div val]) @todos)
    ])
 
-(defn leggtilkontroller [todoliste]
-  #_(let [tekst (r/atom "")]
-  [:div
-   [:input
-    {:type "text"
-     :value @tekst
-      :on-change #(swap! tekst %)
-     }
-    ]
-   [:input
-   { :type "button"
-    :on-click (do
-                 (swap! todoliste #(conj % @tekst))
-                )
-    }
-    ]
-   ]
-  ))
+(defn leggtilkontroller [todos]
+  (let [tekst (r/atom nil)]
+    [:div
+     [:input {:type "text" :value @tekst :on-change #(reset! tekst %)}]
+     [:input {:type "button" :value "legg til" :on-click #(swap! todos conj "fis")}
+      ]]))
 
 
 
 (defn app []
-  (reset! todoliste ["Spise mat" "Rydde kjøkkenet"])
+  (reset! todoliste-global ["Bajse" "Spise mat" "Rydde kjøkkenet"])
   [:div
-   [visliste @todoliste]
-   [leggtilkontroller @todoliste]
+   [visliste todoliste-global]
+   [leggtilkontroller todoliste-global]
    ]
   )
 
