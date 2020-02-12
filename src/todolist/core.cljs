@@ -15,11 +15,15 @@
 (defn leggtilkontroller [todos]
   (let [tekst (r/atom nil)]
     [:div
-     [:input {:type "text" :value @tekst :on-change #(reset! tekst %)}]
-     [:input {:type "button" :value "legg til" :on-click #(swap! todos conj "fis")}
+     [:input {:type "text"  :on-change #(do
+                                         (prn "tekstboksen" (-> % .-target .-value))
+                                         (reset! tekst (-> % .-target .-value))
+                                         )}]
+     [:input {:type "button" :value "legg til" :on-click #(do
+                                                            (swap! todos conj @tekst)
+                                                            (reset! tekst "")
+                                                            )}
       ]]))
-
-
 
 (defn app []
   (reset! todoliste-global ["Bajse" "Spise mat" "Rydde kjøkkenet"])
