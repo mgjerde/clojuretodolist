@@ -1,37 +1,45 @@
 (ns todolist.core
-  (:require [reagent.core :as r]))
+  (:require [reagent.core :as r]
+            [re-frame.core :as rf]
+            ))
 
 (enable-console-print!)
-;;(println "This text is printed from src/todolist/core.cljs. Go ahead and edit it and see reloading in action.")
 
-(def todoliste-global (r/atom ()))
+
+(rf/reg-event-db :initialize
+  (fn [_ _]
+    {:todos ["Bajse" "Spise mat"]
+            :derp {}}))
+
+(rf/reg-event-db
+  :add-todo-item
+  (fn [db [_ new-todo-item]]
+    (assoc db :todos (conj db new-todo-item))))
+
+(rf/reg-sub
+  :todo-items
+  (fn [db _]
+    (:todos db)))
+
+
 
 (defn visliste [todos]
-  (prn @todos)
+  (prn todos)
   [:div
-   (map (fn [val] ^{:key val}[:div val]) @todos)
+   (map (fn [val] ^{:key val}[:div val]) todos)
    ])
 
-(defn leggtilkontroller [todos]
-  (let [tekst (r/atom nil)]
-    [:div
-     [:input {:type "text"  :on-change #(do
-                                         (prn "tekstboksen" (-> % .-target .-value))
-                                         (reset! tekst (-> % .-target .-value))
-                                         )}]
-     [:input {:type "button" :value "legg til" :on-click #(do
-                                                            (swap! todos conj @tekst)
-                                                            (reset! tekst "")
-                                                            )}
-      ]]))
+(defn leggtilkontroller []
+  [:div
+   [:input {:type "text" :on-blur #(rf/dispatch [:add-todo-item (-> % .-target .-value)])}]])
+
 
 (defn app []
-  (reset! todoliste-global ["Bajse" "Spise mat" "Rydde kjøkkenet"])
   [:div
-   [visliste todoliste-global]
-   [leggtilkontroller todoliste-global]
-   ]
-  )
+   [visliste    @(rf/subscribe  [:todo-items])]
+   [leggtilkontroller]])
 
 (r/render [app]
           (.getElementById js/document "app"))
+
+(rf/dispatch [:initialize])
