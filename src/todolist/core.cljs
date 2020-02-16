@@ -14,7 +14,9 @@
 (rf/reg-event-db
   :add-todo-item
   (fn [db [_ new-todo-item]]
-    (assoc db :todos (conj db new-todo-item))))
+    (prn "skal legge til " new-todo-item
+         )
+    (assoc db :todos (conj (:todos db) new-todo-item))))
 
 (rf/reg-sub
   :todo-items
