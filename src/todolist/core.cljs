@@ -14,8 +14,7 @@
 (rf/reg-event-db
   :add-todo-item
   (fn [db [_ new-todo-item]]
-    (prn "skal legge til " new-todo-item
-         )
+    (prn "skal legge til " new-todo-item)
     (assoc db :todos (conj (:todos db) new-todo-item))))
 
 (rf/reg-sub
@@ -33,7 +32,20 @@
 
 (defn leggtilkontroller []
   [:div
-   [:input {:type "text" :on-blur #(rf/dispatch [:add-todo-item (-> % .-target .-value)])}]])
+   [:input {:type "text" :on-blur #(rf/dispatch [:add-todo-item (-> % .-target .-value)])
+
+            :on-key-press (fn [e]
+                           (if (= 13 (.-charCode e))
+                             (do
+                               (rf/dispatch [:add-todo-item (-> e .-target .-value)])
+                               ;                               (set! (.-value e ) "")
+
+                               )))
+            }]
+   ]
+
+
+  )
 
 
 (defn app []
